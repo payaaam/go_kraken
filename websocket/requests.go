@@ -84,12 +84,22 @@ type AuthRequest struct {
 // AddOrderRequest -
 type AddOrderRequest struct {
 	AuthRequest
-	ClosePrice string `json:"close[price]"`
-	Ordertype  string `json:"ordertype"`
-	Pair       string `json:"pair"`
-	Price      string `json:"price"`
-	Type       string `json:"type"`
-	Volume     string `json:"volume"`
+	Ordertype      string `json:"ordertype"`
+	Pair           string `json:"pair"`
+	Price          string `json:"price"`
+	Type           string `json:"type"`
+	Volume         string `json:"volume"`
+	Starttm        string `json:"starttm,omitempty"`
+	Expiretm       string `json:"expiretm,omitempty"`
+	Deadline       string `json:"deadline,omitempty"`
+	Validate       string `json:"validate,omitempty"`
+	TimeInForce    string `json:"timeinforce,omitempty"`
+	UserRef        string `json:"userref,omitempty"`
+	OFlags         string `json:"oflags,omitempty"`
+	Leverage       string `json:"leverage,omitempty"`
+	ClosePrice     string `json:"close[price],omitempty"`
+	ClosePrice2    string `json:"close[price2],omitempty"`
+	CloseOrderType string `json:"close[ordertype],omitempty"`
 }
 
 // AddOrderResponse -
@@ -104,20 +114,40 @@ type AddOrderResponse struct {
 // CancelOrderRequest -
 type CancelOrderRequest struct {
 	AuthRequest
-	TxID []string `json:"txid"`
+	ReqID int64    `json:"reqid,omitempty"`
+	TxID  []string `json:"txid"`
+}
+
+// CancelAllOrdersAfterRequest -
+type CancelAllOrdersAfterRequest struct {
+	AuthRequest
+	Timeout int64 `json:"timeout"`
+	ReqID   int64 `json:"reqid,omitempty"`
 }
 
 // CancelOrderResponse -
 type CancelOrderResponse struct {
-	ErrorMessage string `json:"errorMessage,omitempty"`
+	ReqID        int64  `json:"reqid,omitempty"`
 	Event        string `json:"event"`
 	Status       string `json:"status"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
 }
 
 // CancelAllResponse -
 type CancelAllResponse struct {
+	ReqID        int64  `json:"reqid,omitempty"`
 	Count        int    `json:"count"`
 	Event        string `json:"event"`
 	Status       string `json:"status"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
+}
+
+// CancelAllOrdersAfterResponse -
+type CancelAllOrdersAfterResponse struct {
+	AuthRequest
+	ReqID        int64  `json:"reqid,omitempty"`
+	Status       string `json:"status"`
+	ErrorMessage string `json:"errorMessage,omitempty"`
+	CurrentTime  string `json:"currentTime"`
+	TriggerTime  string `json:"triggerTime"`
 }

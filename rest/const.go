@@ -115,3 +115,17 @@ const (
 	StatusCancelled = "canceled"
 	StatusExpired   = "expired"
 )
+
+// modes
+const (
+	OrderModeGTC = "GTC"
+	OrderModeIOC = "IOC"
+	OrderModeGTD = "GTD"
+)
+
+// Default Retry Count
+const (
+	MaxRequestRetryCount = 3
+	RetryDelayMs         = 50
+	InitialRetryCount    = 1
+)

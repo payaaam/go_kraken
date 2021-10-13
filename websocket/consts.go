@@ -22,20 +22,21 @@ const (
 
 // Events
 const (
-	EventSubscribe             = "subscribe"
-	EventUnsubscribe           = "unsubscribe"
-	EventPing                  = "ping"
-	EventPong                  = "pong"
-	EventSystemStatus          = "systemStatus"
-	EventSubscriptionStatus    = "subscriptionStatus"
-	EventHeartbeat             = "heartbeat"
-	EventAddOrder              = "addOrder"
-	EventAddOrderStatus        = "addOrderStatus"
-	EventCancelOrder           = "cancelOrder"
-	EventCancelOrderStatus     = "cancelOrderStatus"
-	EventCancellAll            = "cancelAll"
-	EventCancellAllStatus      = "cancelAllStatus"
-	EventCancellAllOrdersAfter = "cancelAllOrdersAfter"
+	EventSubscribe                  = "subscribe"
+	EventUnsubscribe                = "unsubscribe"
+	EventPing                       = "ping"
+	EventPong                       = "pong"
+	EventSystemStatus               = "systemStatus"
+	EventSubscriptionStatus         = "subscriptionStatus"
+	EventHeartbeat                  = "heartbeat"
+	EventAddOrder                   = "addOrder"
+	EventAddOrderStatus             = "addOrderStatus"
+	EventCancelOrder                = "cancelOrder"
+	EventCancelOrderStatus          = "cancelOrderStatus"
+	EventCancelAll                  = "cancelAll"
+	EventCancelAllStatus            = "cancelAllStatus"
+	EventCancelAllOrdersAfter       = "cancelAllOrdersAfter"
+	EventCancelAllOrdersAfterStatus = "cancelAllOrdersAfterStatus"
 )
 
 // Intervals
@@ -67,16 +68,33 @@ const (
 	SubscriptionStatusUnsubscribed = "unsubscribed"
 )
 
-// Trade sides
+// Trade sides for parsing
 const (
 	Buy  = "b"
 	Sell = "s"
 )
 
-// Order types
+// Order types for parsing
 const (
 	Market = "m"
 	Limit  = "l"
+)
+
+// Trade sides -
+const (
+	SideBuy  = "buy"
+	SideSell = "sell"
+)
+
+// Order types -
+const (
+	OrderTypeMarket          = "market"
+	OrderTypeLimit           = "limit"
+	OrderTypeStopLoss        = "stop-loss"
+	OrderTypeTakeProfit      = "take-profit"
+	OrderTypeStopLossLimit   = "stop-loss-limit"
+	OrderTypeTakeProfitLimit = "take-profit-limit"
+	OrderTypeSettlePosition  = "settle-position"
 )
 
 // Pairs
@@ -97,6 +115,7 @@ const (
 	BTCCAD  = "XBT/CAD"
 	BTCJPY  = "XBT/JPY"
 	BTCGBP  = "XBT/GBP"
+	BTCUSDT = "XBT/USDT"
 	DASHEUR = "DASH/EUR"
 	DASHUSD = "DASH/USD"
 	DASHBTC = "DASH/XBT"
@@ -117,6 +136,7 @@ const (
 	ETHBTC  = "ETH/XBT"
 	ETHJPY  = "ETH/JPY"
 	ETHGBP  = "ETH/GBP"
+	ETHUSDT = "ETH/USDT"
 	GNOETH  = "GNO/ETH"
 	GNOEUR  = "GNO/EUR"
 	GNOUSD  = "GNO/USD"
@@ -124,6 +144,7 @@ const (
 	LTCEUR  = "LTC/EUR"
 	LTCUSD  = "LTC/USD"
 	LTCBTC  = "LTC/XBT"
+	LTCUSDT = "LTC/USDT"
 	MLNETH  = "MLN/ETH"
 	MLNBTC  = "MLN/XBT"
 	QTUMCAD = "QTUM/CAD"

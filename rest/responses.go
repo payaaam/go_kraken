@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/shopspring/decimal"
 )
 
 func getFloat64FromStr(value interface{}) (float64, error) {
 	str, ok := value.(string)
 	if !ok {
-		return .0, errors.New("Field must be a string")
+		return .0, errors.New("field must be a string")
 	}
 	f, err := strconv.ParseFloat(str, 64)
 	if err != nil {
@@ -22,7 +24,7 @@ func getFloat64FromStr(value interface{}) (float64, error) {
 func getFloat64(value interface{}) (float64, error) {
 	f, ok := value.(float64)
 	if !ok {
-		return .0, errors.New("Field must be a float64")
+		return .0, errors.New("field must be a float64")
 	}
 	return f, nil
 }
@@ -30,7 +32,7 @@ func getFloat64(value interface{}) (float64, error) {
 func getTimestamp(value interface{}) (int64, error) {
 	f, ok := value.(float64)
 	if !ok {
-		return 0, errors.New("Field must be a float64")
+		return 0, errors.New("field must be a float64")
 	}
 	return int64(f), nil
 }
@@ -57,35 +59,36 @@ type Asset struct {
 
 // AssetPair - asset pair information
 type AssetPair struct {
-	Altname           string      `json:"altname"`
-	AssetClassBase    string      `json:"aclass_base"`
-	Base              string      `json:"base"`
-	AssetClassQuote   string      `json:"aclass_quote"`
-	Quote             string      `json:"quote"`
-	Lot               string      `json:"lot"`
-	PairDecimals      int         `json:"pair_decimals"`
-	LotDecimals       int         `json:"lot_decimals"`
-	LotMultiplier     int         `json:"lot_multiplier"`
-	LeverageBuy       []float64   `json:"leverage_buy"`
-	LeverageSell      []float64   `json:"leverage_sell"`
-	Fees              [][]float64 `json:"fees"`
-	FeesMaker         [][]float64 `json:"fees_maker"`
-	FeeVolumeCurrency string      `json:"fee_volume_currency"`
-	MarginCall        int         `json:"margin_call"`
-	MarginStop        int         `json:"margin_stop"`
-	WSName            string      `json:"wsname"`
+	Altname           string          `json:"altname"`
+	AssetClassBase    string          `json:"aclass_base"`
+	Base              string          `json:"base"`
+	AssetClassQuote   string          `json:"aclass_quote"`
+	Quote             string          `json:"quote"`
+	Lot               string          `json:"lot"`
+	PairDecimals      int             `json:"pair_decimals"`
+	LotDecimals       int             `json:"lot_decimals"`
+	LotMultiplier     int             `json:"lot_multiplier"`
+	LeverageBuy       []int           `json:"leverage_buy"`
+	LeverageSell      []int           `json:"leverage_sell"`
+	Fees              [][]float64     `json:"fees"`
+	FeesMaker         [][]float64     `json:"fees_maker"`
+	FeeVolumeCurrency string          `json:"fee_volume_currency"`
+	MarginCall        int             `json:"margin_call"`
+	MarginStop        int             `json:"margin_stop"`
+	WSName            string          `json:"wsname"`
+	OrderMin          decimal.Decimal `json:"ordermin"`
 }
 
 // Level - ticker structure for Ask and Bid
 type Level struct {
-	Price          float64
-	WholeLotVolume float64
-	Volume         float64
+	Price          decimal.Decimal
+	WholeLotVolume decimal.Decimal
+	Volume         decimal.Decimal
 }
 
 // UnmarshalJSON -
 func (item *Level) UnmarshalJSON(buf []byte) error {
-	var tmp []interface{}
+	var tmp []decimal.Decimal
 	if err := json.Unmarshal(buf, &tmp); err != nil {
 		return err
 	}
@@ -93,66 +96,41 @@ func (item *Level) UnmarshalJSON(buf []byte) error {
 		return fmt.Errorf("wrong number of fields in Level: %d != %d", g, e)
 	}
 
-	price, err := getFloat64FromStr(tmp[0])
-	if err != nil {
-		return err
-	}
-	item.Price = price
-
-	whole, err := getFloat64FromStr(tmp[1])
-	if err != nil {
-		return err
-	}
-	item.WholeLotVolume = whole
-
-	vol, err := getFloat64FromStr(tmp[2])
-	if err != nil {
-		return err
-	}
-	item.Volume = vol
+	item.Price = tmp[0]
+	item.WholeLotVolume = tmp[1]
+	item.Volume = tmp[2]
 	return nil
 }
 
-// TimeLevel - ticker structure for Volume, VolumeAveragePrice, Low, High
+// TimeLevel - ticker structure
 type TimeLevel struct {
-	Today       float64
-	Last24Hours float64
+	Today       int64
+	Last24Hours int64
 }
 
 // UnmarshalJSON -
 func (item *TimeLevel) UnmarshalJSON(buf []byte) error {
-	var tmp []interface{}
+	var tmp []int64
 	if err := json.Unmarshal(buf, &tmp); err != nil {
 		return err
 	}
 	if g, e := len(tmp), 2; g != e {
 		return fmt.Errorf("wrong number of fields in TimeLevel: %d != %d", g, e)
 	}
-
-	today, err := getFloat64(tmp[0])
-	if err != nil {
-		return err
-	}
-	item.Today = today
-
-	last, err := getFloat64(tmp[1])
-	if err != nil {
-		return err
-	}
-	item.Last24Hours = last
-
+	item.Today = tmp[0]
+	item.Last24Hours = tmp[1]
 	return nil
 }
 
 // CloseLevel - ticker structure for Close
 type CloseLevel struct {
-	Price     float64
-	LotVolume float64
+	Price     decimal.Decimal
+	LotVolume decimal.Decimal
 }
 
 // UnmarshalJSON -
 func (item *CloseLevel) UnmarshalJSON(buf []byte) error {
-	var tmp []interface{}
+	var tmp []decimal.Decimal
 	if err := json.Unmarshal(buf, &tmp); err != nil {
 		return err
 	}
@@ -160,17 +138,8 @@ func (item *CloseLevel) UnmarshalJSON(buf []byte) error {
 		return fmt.Errorf("wrong number of fields in CloseLevel: %d != %d", g, e)
 	}
 
-	price, err := getFloat64FromStr(tmp[0])
-	if err != nil {
-		return err
-	}
-	item.Price = price
-
-	lot, err := getFloat64FromStr(tmp[1])
-	if err != nil {
-		return err
-	}
-	item.LotVolume = lot
+	item.Price = tmp[0]
+	item.LotVolume = tmp[1]
 
 	return nil
 }
@@ -185,18 +154,18 @@ type Ticker struct {
 	Trades             TimeLevel  `json:"t"`
 	Low                CloseLevel `json:"l"`
 	High               CloseLevel `json:"h"`
-	OpeningPrice       float64    `json:"o,string"`
+	OpeningPrice       decimal.Decimal
 }
 
 // Candle - OHLC item
 type Candle struct {
 	Time      int64
-	Open      float64 `json:",string"`
-	High      float64 `json:",string"`
-	Low       float64 `json:",string"`
-	Close     float64 `json:",string"`
-	VolumeWAP float64 `json:",string"`
-	Volume    float64 `json:",string"`
+	Open      decimal.Decimal
+	High      decimal.Decimal
+	Low       decimal.Decimal
+	Close     decimal.Decimal
+	VolumeWAP decimal.Decimal
+	Volume    decimal.Decimal
 	Count     int64
 }
 
@@ -231,27 +200,27 @@ func (item *OHLCResponse) UnmarshalJSON(buf []byte) error {
 			if err != nil {
 				continue
 			}
-			open, err := getFloat64FromStr(candle[1])
+			open, err := decimal.NewFromString(candle[1].(string))
 			if err != nil {
 				continue
 			}
-			high, err := getFloat64FromStr(candle[2])
+			high, err := decimal.NewFromString(candle[2].(string))
 			if err != nil {
 				continue
 			}
-			low, err := getFloat64FromStr(candle[3])
+			low, err := decimal.NewFromString(candle[3].(string))
 			if err != nil {
 				continue
 			}
-			close, err := getFloat64FromStr(candle[4])
+			close, err := decimal.NewFromString(candle[4].(string))
 			if err != nil {
 				continue
 			}
-			vwap, err := getFloat64FromStr(candle[5])
+			vwap, err := decimal.NewFromString(candle[5].(string))
 			if err != nil {
 				continue
 			}
-			vol, err := getFloat64FromStr(candle[6])
+			vol, err := decimal.NewFromString(candle[6].(string))
 			if err != nil {
 				continue
 			}
@@ -354,19 +323,19 @@ func (item *Trade) UnmarshalJSON(buf []byte) error {
 
 	side, ok := tmp[3].(string)
 	if !ok {
-		return fmt.Errorf("Invalid side type")
+		return errors.New("invalid side type")
 	}
 	item.Side = side
 
 	t, ok := tmp[4].(string)
 	if !ok {
-		return fmt.Errorf("Invalid order type")
+		return errors.New("invalid order type")
 	}
 	item.OrderType = t
 
 	misc, ok := tmp[5].(string)
 	if !ok {
-		return fmt.Errorf("Invalid misc type")
+		return errors.New("invalid misc type")
 	}
 	item.Misc = misc
 	return nil
@@ -559,41 +528,6 @@ type SpreadResponse struct {
 	XZECXXBT []Spread
 	XZECZEUR []Spread
 	XZECZUSD []Spread
-}
-
-// BalanceResponse - response on account balance request
-type BalanceResponse struct {
-	ADA  float64 `json:",string"`
-	BCH  float64 `json:",string"`
-	BSV  float64 `json:",string"`
-	DASH float64 `json:",string"`
-	EOS  float64 `json:",string"`
-	GNO  float64 `json:",string"`
-	KFEE float64 `json:",string"`
-	QTUM float64 `json:",string"`
-	USDT float64 `json:",string"`
-	XDAO float64 `json:",string"`
-	XETC float64 `json:",string"`
-	XETH float64 `json:",string"`
-	XICN float64 `json:",string"`
-	XLTC float64 `json:",string"`
-	XMLN float64 `json:",string"`
-	XNMC float64 `json:",string"`
-	XREP float64 `json:",string"`
-	XXBT float64 `json:",string"`
-	XXDG float64 `json:",string"`
-	XXLM float64 `json:",string"`
-	XXMR float64 `json:",string"`
-	XXRP float64 `json:",string"`
-	XXTZ float64 `json:",string"`
-	XXVN float64 `json:",string"`
-	XZEC float64 `json:",string"`
-	ZCAD float64 `json:",string"`
-	ZEUR float64 `json:",string"`
-	ZGBP float64 `json:",string"`
-	ZJPY float64 `json:",string"`
-	ZKRW float64 `json:",string"`
-	ZUSD float64 `json:",string"`
 }
 
 // TradeBalanceResponse - response of get trade balance request
