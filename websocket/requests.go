@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"math/big"
+	"time"
 )
 
 // EventType - data structure for parsing events
@@ -150,4 +151,9 @@ type CancelAllOrdersAfterResponse struct {
 	ErrorMessage string `json:"errorMessage,omitempty"`
 	CurrentTime  string `json:"currentTime"`
 	TriggerTime  string `json:"triggerTime"`
+}
+
+type Heartbeat struct {
+	Timestamp time.Time
+	Status    string
 }

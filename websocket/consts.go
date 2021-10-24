@@ -63,6 +63,15 @@ const (
 
 // Subscription Statuses
 const (
+	SystemStatusOnline      = "online"
+	SystemStatusMaintenance = "maintenance"
+	SystemStatusCancelOnly  = "cancel_only"
+	SystemStatusLimitOnly   = "limit_only"
+	SystemStatusPostOnly    = "post_only"
+)
+
+// Subscription Statuses
+const (
 	SubscriptionStatusError        = "error"
 	SubscriptionStatusSubscribed   = "subscribed"
 	SubscriptionStatusUnsubscribed = "unsubscribed"
