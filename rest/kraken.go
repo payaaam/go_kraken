@@ -135,9 +135,8 @@ func (api *Kraken) request(method string, isPrivate bool, data url.Values, retTy
 
 	resp, err := api.client.Do(req)
 	if err != nil {
-
 		if retryCount <= MaxRequestRetryCount {
-			fmt.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
+			log.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
 			retryCount += 1
 			time.Sleep(RetryDelayMs * time.Millisecond)
 			return api.request(method, isPrivate, data, retType, retryCount)
@@ -148,7 +147,7 @@ func (api *Kraken) request(method string, isPrivate bool, data url.Values, retTy
 	err = api.parseResponse(resp, retType)
 	if err != nil {
 		if retryCount <= MaxRequestRetryCount {
-			fmt.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
+			log.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
 			retryCount += 1
 			time.Sleep(RetryDelayMs * time.Millisecond)
 			return api.request(method, isPrivate, data, retType, retryCount)
