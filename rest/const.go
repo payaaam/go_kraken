@@ -126,6 +126,6 @@ const (
 // Default Retry Count
 const (
 	MaxRequestRetryCount = 3
-	RetryDelayMs         = 50
+	RetryDelayMs         = 100
 	InitialRetryCount    = 1
 )

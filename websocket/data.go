@@ -271,6 +271,7 @@ type OpenOrder struct {
 	StartTime  json.Number    `json:"starttm"`
 	ExpireTime json.Number    `json:"expiretm"`
 	Price      json.Number    `json:"price"`
+	AvgPrice   json.Number    `json:"avg_price"`
 	Refid      string         `json:"refid"`
 	Status     string         `json:"status"`
 	StopPrice  json.Number    `json:"stopprice"`

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // clientInterface - for testing purpose
@@ -120,13 +121,6 @@ func (api *Kraken) parseResponse(response *http.Response, retType interface{}) e
 	return nil
 }
 
-/*
-request 1 => err
-request 2 => err
-request 3 =>
-
-
-*/
 func (api *Kraken) request(method string, isPrivate bool, data url.Values, retType interface{}, retryCount int) error {
 	req, err := api.prepareRequest(method, isPrivate, data)
 	if err != nil {
@@ -135,9 +129,8 @@ func (api *Kraken) request(method string, isPrivate bool, data url.Values, retTy
 
 	resp, err := api.client.Do(req)
 	if err != nil {
-
 		if retryCount <= MaxRequestRetryCount {
-			fmt.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
+			logrus.Debugf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
 			retryCount += 1
 			time.Sleep(RetryDelayMs * time.Millisecond)
 			return api.request(method, isPrivate, data, retType, retryCount)
@@ -148,7 +141,7 @@ func (api *Kraken) request(method string, isPrivate bool, data url.Values, retTy
 	err = api.parseResponse(resp, retType)
 	if err != nil {
 		if retryCount <= MaxRequestRetryCount {
-			fmt.Printf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
+			logrus.Debugf("Retrying request %d of %d\n", retryCount, MaxRequestRetryCount)
 			retryCount += 1
 			time.Sleep(RetryDelayMs * time.Millisecond)
 			return api.request(method, isPrivate, data, retType, retryCount)
