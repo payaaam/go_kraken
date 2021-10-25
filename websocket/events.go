@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -30,15 +29,7 @@ func (k *Kraken) handleEvent(msg []byte) error {
 	case EventCancelAllOrdersAfter:
 		return k.handleEventCancellAllOrdersAfter(msg)
 	case EventHeartbeat:
-		currentTime := time.Now().Unix()
-		if currentTime%30 == 0 {
-			wsType := "public"
-			if k.token != "" {
-				wsType = "private"
-			}
-			log.Info(fmt.Sprintf("Kraken %s heartbeat received.", wsType))
-		}
-
+		return k.handleHeartbeat(msg)
 	default:
 		log.Warnf("unknown event: %s", msg)
 	}
@@ -55,27 +46,34 @@ func (k *Kraken) handleEventSystemStatus(data []byte) error {
 	if err := json.Unmarshal(data, &systemStatus); err != nil {
 		return err
 	}
-	log.Infof("Status: %s", systemStatus.Status)
-	log.Infof("Connection ID: %s", systemStatus.ConnectionID.String())
-	log.Infof("Version: %s", systemStatus.Version)
+	k.msg <- Update{
+		ChannelName: EventSystemStatus,
+		Data:        systemStatus,
+	}
 	return nil
 }
 
+func (k *Kraken) handleHeartbeat(data []byte) error {
+	k.msg <- Update{
+		ChannelName: EventHeartbeat,
+		Data: Heartbeat{
+			Timestamp: time.Now().UTC(),
+		},
+	}
+	return nil
+}
 func (k *Kraken) handleEventSubscriptionStatus(data []byte) error {
 	var status SubscriptionStatus
 	if err := json.Unmarshal(data, &status); err != nil {
 		return err
 	}
 
-	if status.Status == SubscriptionStatusError {
-		log.Errorf("%s: %s", status.Error, status.Pair)
-	} else {
-		log.Infof("\tStatus: %s", status.Status)
-		log.Infof("\tPair: %s", status.Pair)
-		log.Infof("\tSubscription: %s", status.Subscription.Name)
-		log.Infof("\tChannel ID: %d", status.ChannelID)
-		log.Infof("\tReq ID: %s", status.ReqID)
+	k.msg <- Update{
+		ChannelName: EventSubscriptionStatus,
+		Data:        status,
+	}
 
+	if status.Status != SubscriptionStatusError {
 		if status.Status == SubscriptionStatusSubscribed {
 			k.subscriptions[status.ChannelID] = &status
 		} else if status.Status == SubscriptionStatusUnsubscribed {
